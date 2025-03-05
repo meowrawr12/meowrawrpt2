@@ -21,53 +21,21 @@ def check_winner(board):
 def is_full(board):
     return all(cell != " " for row in board for cell in row)
 
-def minimax(board, depth, is_maximizing, alpha, beta):
-    winner = check_winner(board)
-    if winner == "X":
-        return -10 + depth  # The AI wants to minimize score
-    if winner == "O":
-        return 10 - depth   # The AI wants to maximize score
-    if is_full(board):
-        return 0
-    
-    if random.random() < 0.2:  # Introduce unpredictability
-        return random.randint(-5, 5)
-    
-    if is_maximizing:
-        max_eval = float('-inf')
-        for i in range(3):
-            for j in range(3):
-                if board[i][j] == " ":
-                    board[i][j] = "O"
-                    eval = minimax(board, depth + 1, False, alpha, beta)
-                    board[i][j] = " "
-                    max_eval = max(max_eval, eval)
-                    alpha = max(alpha, eval)
-                    if beta <= alpha:
-                        break
-        return max_eval
-    else:
-        min_eval = float('inf')
-        for i in range(3):
-            for j in range(3):
-                if board[i][j] == " ":
-                    board[i][j] = "X"
-                    eval = minimax(board, depth + 1, True, alpha, beta)
-                    board[i][j] = " "
-                    min_eval = min(min_eval, eval)
-                    beta = min(beta, eval)
-                    if beta <= alpha:
-                        break
-        return min_eval
+def random_ai_move(board):
+    empty_cells = [(i, j) for i in range(3) for j in range(3) if board[i][j] == " "]
+    return random.choice(empty_cells) if empty_cells else (-1, -1)
 
-def best_move(board):
+def smart_ai_move(board):
+    if random.random() < 0.5:  # 50% chance to play a random move for unpredictability
+        return random_ai_move(board)
+    
     best_score = float('-inf')
     move = (-1, -1)
     for i in range(3):
         for j in range(3):
             if board[i][j] == " ":
                 board[i][j] = "O"
-                score = minimax(board, 0, False, float('-inf'), float('inf'))
+                score = random.randint(-10, 10)  # Introduce randomness in move scoring
                 board[i][j] = " "
                 if score > best_score:
                     best_score = score
@@ -96,7 +64,7 @@ def play_game():
             player_move(board)
         else:
             print("AI is thinking...")
-            row, col = best_move(board)
+            row, col = smart_ai_move(board)
             board[row][col] = "O"
         print_board(board)
         winner = check_winner(board)
